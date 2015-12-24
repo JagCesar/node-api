@@ -1,0 +1,22 @@
+{
+  "name": "munch-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JagCesar/munch-api.git"
+  },
+  "dependencies": {
+    "koa": "1.1.2"
+  },
+  "author": "César Pinto Castillo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JagCesar/munch-api/issues"
+  },
+  "homepage": "https://github.com/JagCesar/munch-api#readme"
+}
