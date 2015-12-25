@@ -11,7 +11,9 @@
     "url": "git+https://github.com/JagCesar/munch-api.git"
   },
   "dependencies": {
-    "koa": "1.1.2"
+    "koa": "1.1.2",
+    "koa-route": "2.4.2",
+    "pg": "4.4.3"
   },
   "author": "César Pinto Castillo",
   "license": "ISC",
