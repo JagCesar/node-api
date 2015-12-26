@@ -2,7 +2,8 @@ var koa = require('koa'),
 	route = require('koa-route'),
 	app = module.exports = koa(),
 	pg = require('pg'),
-	bouncer = require('koa-bouncer');
+	bouncer = require('koa-bouncer'),
+	jwt = require('koa-jwt');
 
 app.use(bouncer.middleware());
 
@@ -36,6 +37,14 @@ function *asd() {
     .trim();
 
     this.body = 'valid';
+}
+
+app.use(jwt({ secret: 'shared-secret' }));
+
+app.use(route.get('/protected', protected));
+
+function *protected() {
+	this.body = 'protected';
 }
 
 app.listen((process.env.PORT || 4000));
