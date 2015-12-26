@@ -10,6 +10,7 @@ app.use(bouncer.middleware());
 app.use(route.get('/', index));
 app.use(route.get('/db', db));
 app.use(route.get('/asd', asd));
+app.use(route.get('/register', register));
 
 function *index() {
 	this.body = 'Hello world';
@@ -37,6 +38,11 @@ function *asd() {
     .trim();
 
     this.body = 'valid';
+}
+
+function *register() {
+	var token = jwt.sign({ foo: 'bar' }, 'shared-secret');
+	this.body = token
 }
 
 app.use(jwt({ secret: 'shared-secret' }));
