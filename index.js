@@ -10,20 +10,20 @@ app.use(koaPg(process.env.DATABASE_URL))
 app.use(bouncer.middleware());
 
 app.use(route.get('/', index));
-app.use(route.get('/asd', asd));
+app.use(route.get('/validate', validate));
 app.use(route.get('/register', register));
 
 function *index() {
 	this.body = 'Hello world';
 }
 
-function *asd() {
-	this.validateQuery('asd')
-		.required('asd required')
+function *validate() {
+	this.validateQuery('argument')
+		.required('argument required')
     .isString()
     .trim();
 
-    this.body = 'valid';
+    this.body = 'Valid query';
 }
 
 function *register() {
