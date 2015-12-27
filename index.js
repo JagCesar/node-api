@@ -4,17 +4,19 @@ var koa = require('koa'),
 	koaPg = require('koa-pg'),
 	bouncer = require('koa-bouncer'),
 	jwt = require('koa-jwt'),
-	uuid = require('uuid');
+	uuid = require('uuid'),
+	json = require('koa-json');
 
 app.use(koaPg(process.env.DATABASE_URL))
 app.use(bouncer.middleware());
+app.use(json({ pretty: false, param: 'pretty' }));
 
 app.use(route.get('/', index));
 app.use(route.get('/validate', validate));
 app.use(route.get('/register', register));
 
 function *index() {
-	this.body = 'Hello world';
+	this.body = {'message': 'Hello world'};
 }
 
 function *validate() {
@@ -23,7 +25,7 @@ function *validate() {
     .isString()
     .trim();
 
-    this.body = 'Valid query';
+    this.body = {'message': 'Valid query'};
 }
 
 function *register() {
@@ -31,7 +33,7 @@ function *register() {
 	var query = 'INSERT INTO users (uuid) VALUES (\'' + uuidString + '\');';
 	var result = yield this.pg.db.client.query_(query);
 	var token = jwt.sign({ uuid: uuidString }, process.env.JWT_SECRET);
-	this.body = token;
+	this.body = {'jwt': token};
 }
 
 app.use(jwt({secret: process.env.JWT_SECRET}));
