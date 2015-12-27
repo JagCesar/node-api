@@ -33,3 +33,10 @@ Next thing you have to do is install [node-foreman](https://github.com/strongloo
 # Get it running 🏃
 
 Make sure you're in the cloned repository folder, and then write `npm install` to install dependencies needed. Once this is done you write `npm start` to get it up and running.
+
+# Endpoints
+
+- `/` Writes out hello world. Nothing fancy
+- `/validated` Validates that you're sending the GET argument `argument`. To get a 200 back, call `/validated?argument`
+- `/register` Creates a new user entry in the database with a unique uuid. Then signs a new JWT that contains this uuid and returns it.
+- `/protected` Requires you to send a valid JWT token that was signed by this API. It has to be provided as a HTTP Header (`Authorization`). If it is valid we return the content of the JWT
