@@ -50,7 +50,7 @@ app.use(jwt({ secret: 'shared-secret' }));
 app.use(route.get('/protected', protected));
 
 function *protected() {
-	this.body = 'protected';
+	this.body = this.state.user;
 }
 
 app.listen((process.env.PORT || 4000));
