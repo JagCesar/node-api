@@ -41,11 +41,11 @@ function *asd() {
 }
 
 function *register() {
-	var token = jwt.sign({ foo: 'bar' }, 'shared-secret');
+	var token = jwt.sign({ foo: 'bar' }, process.env.JWT_SECRET);
 	this.body = token
 }
 
-app.use(jwt({ secret: 'shared-secret' }));
+app.use(jwt({secret: process.env.JWT_SECRET}));
 
 app.use(route.get('/protected', protected));
 
@@ -53,4 +53,4 @@ function *protected() {
 	this.body = this.state.user;
 }
 
-app.listen((process.env.PORT || 4000));
+app.listen(process.env.PORT);
