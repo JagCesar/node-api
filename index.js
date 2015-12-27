@@ -3,25 +3,18 @@ var koa = require('koa'),
 	app = module.exports = koa(),
 	koaPg = require('koa-pg'),
 	bouncer = require('koa-bouncer'),
-	jwt = require('koa-jwt');
+	jwt = require('koa-jwt'),
+	uuid = require('uuid');
 
 app.use(koaPg(process.env.DATABASE_URL))
 app.use(bouncer.middleware());
 
 app.use(route.get('/', index));
-app.use(route.get('/db', db));
 app.use(route.get('/asd', asd));
 app.use(route.get('/register', register));
 
 function *index() {
 	this.body = 'Hello world';
-}
-
-function *db() {
-	var result = yield this.pg.db.client.query_('SELECT table_schema,table_name FROM information_schema.tables;')
-    console.log('result:', result)
-
-    this.body = 'db'
 }
 
 function *asd() {
@@ -34,8 +27,11 @@ function *asd() {
 }
 
 function *register() {
-	var token = jwt.sign({ foo: 'bar' }, process.env.JWT_SECRET);
-	this.body = token
+	var uuidString = uuid.v4();
+	var query = 'INSERT INTO users (uuid) VALUES (\'' + uuidString + '\');';
+	var result = yield this.pg.db.client.query_(query);
+	var token = jwt.sign({ uuid: uuidString }, process.env.JWT_SECRET);
+	this.body = token;
 }
 
 app.use(jwt({secret: process.env.JWT_SECRET}));
