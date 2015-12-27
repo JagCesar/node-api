@@ -1,10 +1,11 @@
 var koa = require('koa'),
 	route = require('koa-route'),
 	app = module.exports = koa(),
-	pg = require('pg'),
+	koaPg = require('koa-pg'),
 	bouncer = require('koa-bouncer'),
 	jwt = require('koa-jwt');
 
+app.use(koaPg(process.env.DATABASE_URL))
 app.use(bouncer.middleware());
 
 app.use(route.get('/', index));
@@ -17,18 +18,10 @@ function *index() {
 }
 
 function *db() {
-	pg.connect(process.env.DATABASE_URL, function(err, client) {
-		if (err) throw err;
-		console.log('Connected to postgres! Getting schemas...');
+	var result = yield this.pg.db.client.query_('SELECT table_schema,table_name FROM information_schema.tables;')
+    console.log('result:', result)
 
-		client
-		.query('SELECT table_schema,table_name FROM information_schema.tables;')
-    .on('row', function(row) {
-      console.log(JSON.stringify(row));
-    })
-  });
-
-  this.body = 'db';
+    this.body = 'db'
 }
 
 function *asd() {
