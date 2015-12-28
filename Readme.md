@@ -2,6 +2,13 @@
 
 I needed to create an API for a side project so I decided to learn how it could be done. My JS skills are terrible, and this is the first time I play around with Postgres and Heroku. So if you find any errors, please post a Pull Request :)
 
+# Features
+
+- JSON responses
+- Validation of arguments
+- User registration, returns a unique JWT if successful
+- Protected endpoints that require the user to send a valid JWT to gain access
+
 # Prerequisites
 
 To get this up and running you have to set up a Heroku web dyno and a Heroku Postgres database. [They have a great tutorial for this if you're unsure how to do this](https://devcenter.heroku.com/articles/getting-started-with-nodejs#introduction).
