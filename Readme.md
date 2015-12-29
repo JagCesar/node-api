@@ -45,8 +45,6 @@ SELECT AddGeometryColumn('added_items', 'location', 4326, 'POINT', 2);
 
 When saving a coordinate in the database we want to store lon, lat and SRID. SRID is a unique identifier that defines which coordinate system the coordinates are defined in. If we define the correct SRID, we can compare coordinates with different definitions. Coordinates sent to us from iOS are using SRID `4326`. Google maps use the same SRID. [I found this information here](http://gis.stackexchange.com/questions/48949/epsg-3857-or-4326-for-googlemaps-openstreetmap-and-leaflet).
 
-## Postgis
-
 # Environment vars
 
 Some variables aren't available in the code, such as `process.env.DATABASE_URL`, `process.env.PORT` and `process.env.JWT_SECRET`. I made this on purpose since these would give you access to my Heroku environment. To set these values you create a file named `.env` in your cloned repository folder and add this content:
