@@ -53,4 +53,12 @@ function *protected() {
 	this.body = this.state.user;
 }
 
+function *saveLocation() {
+	 var query = 'INSERT INTO added_items (location) VALUES (ST_GeomFromText(\'POINT(59.3306705 18.0563152)\', 4326));';
+}
+
+function *distance() {
+	var query = 'SELECT location FROM added_items WHERE ST_Distance_Sphere(location,ST_GeomFromText(\'POINT(59.3354419 18.0577941)\', 4326)) < 500;';
+}
+
 app.listen(process.env.PORT);
