@@ -12,11 +12,20 @@ app.use(bouncer.middleware());
 app.use(json({ pretty: false, param: 'pretty' }));
 
 app.use(route.get('/', index));
+app.use(route.get('/db', initDB));
 app.use(route.get('/validate', validate));
 app.use(route.get('/register', register));
 
 function *index() {
 	this.body = {'message': 'Hello world'};
+}
+
+function *initDB() {
+	yield this.pg.db.client.query_('CREATE EXTENSION postgis;');
+	yield this.pg.db.client.query_('CREATE TABLE users ( id SERIAL, uuid UUID NOT NULL);');
+	yield this.pg.db.client.query_('CREATE TABLE "added_items" ( "id" serial, PRIMARY KEY ("id"));');
+	yield this.pg.db.client.query_('SELECT AddGeometryColumn(\'added_items\', \'location\', 4326, \'POINT\', 2);');
+	this.body = '1'
 }
 
 function *validate() {
