@@ -1,4 +1,4 @@
-# Learning [Node.js](https://nodejs.org), [koa](http://koajs.com), [JWT](http://jwt.io), [Postgres](http://www.postgresql.org) and [Heroku](https://www.heroku.com)
+# Learning [Node.js](https://nodejs.org), [koa](http://koajs.com), [JWT](http://jwt.io), [Postgres](http://www.postgresql.org), [Postgis](http://postgis.net) and [Heroku](https://www.heroku.com)
 
 I needed to create an API for a side project so I decided to learn how it could be done. My JS skills are terrible, and this is the first time I play around with Postgres and Heroku. So if you find any errors, please post a Pull Request :)
 
@@ -13,13 +13,11 @@ I needed to create an API for a side project so I decided to learn how it could 
 
 To get this up and running you have to set up a Heroku web dyno and a Heroku Postgres database. [They have a great tutorial for this if you're unsure how to do this](https://devcenter.heroku.com/articles/getting-started-with-nodejs#introduction).
 
-Your Postgres database needs tables. To create the required tables simply browse to `/db` when your webservice is up and running.
-
 # Location, location, location
 
-To store locations in our database we use Postgis, which is available on Heroku.
+To store locations in our database we use [Postgis](http://postgis.net), which is available on Heroku.
 
-When saving a coordinate in the database we want to store lon, lat and SRID. SRID is a unique identifier that defines which coordinate system the coordinates are defined in. If we define the correct SRID, we can compare coordinates with different definitions. Coordinates sent to us from iOS are using SRID `4326`. Google maps use the same SRID. [I found this information here](http://gis.stackexchange.com/questions/48949/epsg-3857-or-4326-for-googlemaps-openstreetmap-and-leaflet).
+When saving a coordinate in the database we want to store lon, lat and SRID. SRID is a unique identifier that defines which coordinate system the coordinates are defined in. We store the SRID to be able to mix different different type of coordinates in the future. Coordinates sent to us from iOS are using SRID `4326`. Google maps uses the same SRID. [I found this information here](http://gis.stackexchange.com/questions/48949/epsg-3857-or-4326-for-googlemaps-openstreetmap-and-leaflet).
 
 # Environment vars
 
@@ -38,7 +36,10 @@ Next thing you have to do is install [node-foreman](https://github.com/strongloo
 
 # Get it running 🏃
 
-Make sure you're in the cloned repository folder, and then write `npm install` to install dependencies needed. Once this is done you write `npm start` to get it up and running.
+Make sure you're in the cloned repository folder, then do the following:
+- Write `npm install` to install the dependencies needed
+- Write `npm start` to get the service up and running locally
+- Write `curl http://localhost:4000/db` to create the required tables in the database
 
 # Endpoints
 
