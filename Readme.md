@@ -13,7 +13,7 @@ I needed to create an API for a side project so I decided to learn how it could 
 
 To get this up and running you have to set up a Heroku web dyno and a Heroku Postgres database. [They have a great tutorial for this if you're unsure how to do this](https://devcenter.heroku.com/articles/getting-started-with-nodejs#introduction).
 
-Your Postgres database needs a table named `users`. Connect to your database and run this query to set it up:
+Your Postgres database needs tables. Connect to your database and run these queries to set it up:
 
 ```
 CREATE TABLE users (
@@ -21,6 +21,31 @@ CREATE TABLE users (
     uuid			UUID NOT NULL
 );
 ```
+
+```
+CREATE TABLE "added_items" (
+    "id" serial,
+    PRIMARY KEY ("id")
+);
+```
+
+# Location, location, location
+
+To store locations in our database we use Postgis. Postgis is available on Heroku, but to activate it you have to enter this query:
+
+```
+CREATE EXTENSION postgis;
+```
+
+To add spatial data to the table `added_items` you have to write the following query:
+
+```
+SELECT AddGeometryColumn('added_items', 'location', 4326, 'POINT', 2);
+```
+
+When saving a coordinate in the database we want to store lon, lat and SRID. SRID is a unique identifier that defines which coordinate system the coordinates are defined in. If we define the correct SRID, we can compare coordinates with different definitions. Coordinates sent to us from iOS are using SRID `4326`. Google maps use the same SRID. [I found this information here](http://gis.stackexchange.com/questions/48949/epsg-3857-or-4326-for-googlemaps-openstreetmap-and-leaflet).
+
+## Postgis
 
 # Environment vars
 
