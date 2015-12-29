@@ -13,35 +13,11 @@ I needed to create an API for a side project so I decided to learn how it could 
 
 To get this up and running you have to set up a Heroku web dyno and a Heroku Postgres database. [They have a great tutorial for this if you're unsure how to do this](https://devcenter.heroku.com/articles/getting-started-with-nodejs#introduction).
 
-Your Postgres database needs tables. Connect to your database and run these queries to set it up:
-
-```
-CREATE TABLE users (
-    id            SERIAL,
-    uuid			UUID NOT NULL
-);
-```
-
-```
-CREATE TABLE "added_items" (
-    "id" serial,
-    PRIMARY KEY ("id")
-);
-```
+Your Postgres database needs tables. To create the required tables simply browse to `/db` when your webservice is up and running.
 
 # Location, location, location
 
-To store locations in our database we use Postgis. Postgis is available on Heroku, but to activate it you have to enter this query:
-
-```
-CREATE EXTENSION postgis;
-```
-
-To add spatial data to the table `added_items` you have to write the following query:
-
-```
-SELECT AddGeometryColumn('added_items', 'location', 4326, 'POINT', 2);
-```
+To store locations in our database we use Postgis, which is available on Heroku.
 
 When saving a coordinate in the database we want to store lon, lat and SRID. SRID is a unique identifier that defines which coordinate system the coordinates are defined in. If we define the correct SRID, we can compare coordinates with different definitions. Coordinates sent to us from iOS are using SRID `4326`. Google maps use the same SRID. [I found this information here](http://gis.stackexchange.com/questions/48949/epsg-3857-or-4326-for-googlemaps-openstreetmap-and-leaflet).
 
@@ -70,3 +46,4 @@ Make sure you're in the cloned repository folder, and then write `npm install` t
 - `/validated` Validates that you're sending the GET argument `argument`. To get a 200 back, call `/validated?argument`
 - `/register` Creates a new user entry in the database with a unique uuid. Then signs a new JWT that contains this uuid and returns it.
 - `/protected` Requires you to send a valid JWT token that was signed by this API. It has to be provided as a HTTP Header (`Authorization`). If it is valid we return the content of the JWT
+- `/db` Creates the tables needed and sets up PostGIS
