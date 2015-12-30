@@ -15,6 +15,7 @@ app.use(route.get('/', index));
 app.use(route.get('/db', initDB));
 app.use(route.get('/validate', validate));
 app.use(route.get('/register', register));
+app.use(route.get('/checkIn', checkIn));
 
 function *index() {
 	this.body = {'message': 'Hello world'};
