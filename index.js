@@ -22,9 +22,9 @@ function *index() {
 
 function *initDB() {
 	yield this.pg.db.client.query_('CREATE EXTENSION postgis;');
-	yield this.pg.db.client.query_('CREATE TABLE users ( id SERIAL, uuid UUID NOT NULL);');
-	yield this.pg.db.client.query_('CREATE TABLE "added_items" ( "id" serial, PRIMARY KEY ("id"));');
-	yield this.pg.db.client.query_('SELECT AddGeometryColumn(\'added_items\', \'location\', 4326, \'POINT\', 2);');
+	yield this.pg.db.client.query_('CREATE TABLE "users" ("id" SERIAL, "uuid" UUID NOT NULL, PRIMARY KEY ("id"));');
+	yield this.pg.db.client.query_('CREATE TABLE "check_ins" ("id" serial, "users.id" serial, PRIMARY KEY ("id"), FOREIGN KEY ("users.id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE);');
+	yield this.pg.db.client.query_('SELECT AddGeometryColumn(\'check_ins\', \'location\', 4326, \'POINT\', 2);');
 	this.body = '1'
 }
 
@@ -53,12 +53,14 @@ function *protected() {
 	this.body = this.state.user;
 }
 
-function *saveLocation() {
-	 var query = 'INSERT INTO added_items (location) VALUES (ST_GeomFromText(\'POINT(59.3306705 18.0563152)\', 4326));';
+function *checkIn() {
+	var uuid = this.state.user['uuid'];
+	console.log(uuid);
+	 var query = 'INSERT INTO check_ins (location) VALUES (ST_GeomFromText(\'POINT(59.3306705 18.0563152)\', 4326));';
 }
 
 function *distance() {
-	var query = 'SELECT location FROM added_items WHERE ST_Distance_Sphere(location,ST_GeomFromText(\'POINT(59.3354419 18.0577941)\', 4326)) < 500;';
+	var query = 'SELECT location FROM check_ins WHERE ST_Distance_Sphere(location,ST_GeomFromText(\'POINT(59.3354419 18.0577941)\', 4326)) < 500;';
 }
 
 app.listen(process.env.PORT);
