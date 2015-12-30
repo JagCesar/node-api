@@ -15,7 +15,6 @@ app.use(route.get('/', index));
 app.use(route.get('/db', initDB));
 app.use(route.get('/validate', validate));
 app.use(route.get('/register', register));
-app.use(route.get('/checkIn', checkIn));
 
 function *index() {
 	this.body = {'message': 'Hello world'};
@@ -49,6 +48,7 @@ function *register() {
 app.use(jwt({secret: process.env.JWT_SECRET}));
 
 app.use(route.get('/protected', protected));
+app.use(route.get('/checkIn', checkIn));
 
 function *protected() {
 	this.body = this.state.user;
@@ -56,8 +56,9 @@ function *protected() {
 
 function *checkIn() {
 	var uuid = this.state.user['uuid'];
-	console.log(uuid);
-	 var query = 'INSERT INTO check_ins (location) VALUES (ST_GeomFromText(\'POINT(59.3306705 18.0563152)\', 4326));';
+	var query = 'INSERT INTO check_ins ("location", "users.id") VALUES (ST_GeomFromText(\'POINT(59.3306705 18.0563152)\', 4326), (SELECT id FROM users WHERE uuid=\'' + uuid + '\'));';
+	var result = yield this.pg.db.client.query_(query);
+	this.body = '';
 }
 
 function *distance() {
