@@ -13,7 +13,6 @@ app.use(json({ pretty: false, param: 'pretty' }));
 
 app.use(route.get('/', index));
 app.use(route.get('/db', initDB));
-app.use(route.get('/validate', validate));
 app.use(route.get('/register', register));
 
 function *index() {
@@ -27,15 +26,6 @@ function *initDB() {
   yield this.pg.db.client.query_('CREATE TABLE "check_ins" ("id" serial, "users.id" serial, PRIMARY KEY ("id"), FOREIGN KEY ("users.id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE);');
   yield this.pg.db.client.query_('SELECT AddGeometryColumn(\'check_ins\', \'location\', 4326, \'POINT\', 2);');
   this.body = '1'
-}
-
-function *validate() {
-  this.validateQuery('argument')
-    .required('argument required')
-    .isString()
-    .trim();
-
-  this.body = {'message': 'Valid query'};
 }
 
 function *register() {
