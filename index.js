@@ -25,6 +25,13 @@ function *initDB() {
   yield this.pg.db.client.query_('CREATE TABLE "places" ("id" serial, "name" text, PRIMARY KEY ("id"));');
   yield this.pg.db.client.query_('SELECT AddGeometryColumn(\'places\', \'coordinate\', 4326, \'POINT\', 2);');
   yield this.pg.db.client.query_('CREATE TABLE "check_ins" ("id" serial, "users.id" serial, "places.id" serial, PRIMARY KEY ("id"), FOREIGN KEY ("users.id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE, FOREIGN KEY ("places.id") REFERENCES "places"("id") ON DELETE CASCADE ON UPDATE CASCADE);');
+
+  // Let's populate the places table
+  yield this.pg.db.client.query_('INSERT INTO places ("name", "coordinate") VALUES (\'Apple HQ\', ST_GeomFromText(\'POINT(37.3317115 -122.0323722)\', 4326));');
+  yield this.pg.db.client.query_('INSERT INTO places ("name", "coordinate") VALUES (\'Facebook HQ\', ST_GeomFromText(\'POINT(37.4833149 -122.1517118)\', 4326));');
+  yield this.pg.db.client.query_('INSERT INTO places ("name", "coordinate") VALUES (\'Google HQ\', ST_GeomFromText(\'POINT(37.4219999 -122.0862462)\', 4326));');
+  yield this.pg.db.client.query_('INSERT INTO places ("name", "coordinate") VALUES (\'Twitter HQ\', ST_GeomFromText(\'POINT(37.776692 -122.4189706)\', 4326));');
+
   this.body = '1';
 }
 
