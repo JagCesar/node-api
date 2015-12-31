@@ -55,8 +55,14 @@ function *protected() {
 }
 
 function *checkIn() {
+	this.validateQuery('lat')
+		.required('Latitude required');
+
+	this.validateQuery('lon')
+		.required('Longitude required');
+
 	var uuid = this.state.user['uuid'];
-	var query = 'INSERT INTO check_ins ("location", "users.id") VALUES (ST_GeomFromText(\'POINT(59.3306705 18.0563152)\', 4326), (SELECT id FROM users WHERE uuid=\'' + uuid + '\'));';
+	var query = 'INSERT INTO check_ins ("location", "users.id") VALUES (ST_GeomFromText(\'POINT(' + this.vals.lat + ' ' + this.vals.lon + ')\', 4326), (SELECT id FROM users WHERE uuid=\'' + uuid + '\'));';
 	var result = yield this.pg.db.client.query_(query);
 	this.body = '';
 }
