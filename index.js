@@ -22,9 +22,10 @@ function *index() {
 function *initDB() {
   yield this.pg.db.client.query_('CREATE EXTENSION postgis;');
   yield this.pg.db.client.query_('CREATE TABLE "users" ("id" SERIAL, "uuid" UUID NOT NULL, PRIMARY KEY ("id"));');
-  yield this.pg.db.client.query_('CREATE TABLE "check_ins" ("id" serial, "users.id" serial, PRIMARY KEY ("id"), FOREIGN KEY ("users.id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE);');
-  yield this.pg.db.client.query_('SELECT AddGeometryColumn(\'check_ins\', \'location\', 4326, \'POINT\', 2);');
-  this.body = '1'
+  yield this.pg.db.client.query_('CREATE TABLE "places" ("id" serial, "name" text, PRIMARY KEY ("id"));');
+  yield this.pg.db.client.query_('SELECT AddGeometryColumn(\'places\', \'coordinate\', 4326, \'POINT\', 2);');
+  yield this.pg.db.client.query_('CREATE TABLE "check_ins" ("id" serial, "users.id" serial, "places.id" serial, PRIMARY KEY ("id"), FOREIGN KEY ("users.id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE, FOREIGN KEY ("places.id") REFERENCES "places"("id") ON DELETE CASCADE ON UPDATE CASCADE);');
+  this.body = '1';
 }
 
 function *register() {
