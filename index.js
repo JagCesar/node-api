@@ -16,7 +16,6 @@ app.use(route.get('/db', initDB));
 app.use(route.get('/register', register));
 
 function *index() {
-  console.log(this.req);
   this.body = {'message': 'Hello world'};
 }
 
