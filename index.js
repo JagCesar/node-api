@@ -46,6 +46,7 @@ function *register() {
 app.use(jwt({secret: process.env.JWT_SECRET}));
 
 app.use(route.get('/checkIn', checkIn));
+app.use(route.get('/locations', locations));
 
 function *checkIn() {
   this.validateQuery('lat')
@@ -58,6 +59,11 @@ function *checkIn() {
   var query = 'INSERT INTO check_ins ("location", "users.id") VALUES (ST_GeomFromText(\'POINT(' + this.vals.lat + ' ' + this.vals.lon + ')\', 4326), (SELECT id FROM users WHERE uuid=\'' + uuid + '\'));';
   var result = yield this.pg.db.client.query_(query);
   this.body = '';
+}
+
+function *locations() {
+  result = yield this.pg.db.client.query_('SELECT id, name FROM places;');
+  this.body = result.rows;
 }
 
 function *distance() {
