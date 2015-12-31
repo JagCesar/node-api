@@ -38,12 +38,7 @@ function *register() {
 
 app.use(jwt({secret: process.env.JWT_SECRET}));
 
-app.use(route.get('/protected', protected));
 app.use(route.get('/checkIn', checkIn));
-
-function *protected() {
-  this.body = this.state.user;
-}
 
 function *checkIn() {
   this.validateQuery('lat')

@@ -46,5 +46,4 @@ Make sure you're in the cloned repository folder, then do the following:
 - `/` Writes out hello world. Nothing fancy
 - `/db` Creates the tables needed and sets up PostGIS
 - `/register` Creates a new user entry in the database with a unique uuid. Then signs a new JWT that contains this uuid and returns it.
-- `/protected` Requires you to send a valid JWT token that was signed by this API. It has to be provided as a HTTP Header (`Authorization`). If it is valid we return the content of the JWT
 - `/checkIn` Creates a new entry in the the `check_ins` table in the database connected to the current user. This endpoint requires two GET queries, `lat`(latitude) and `lon`(longitude), and a valid JWT. The JWT has to be provided as a HTTP Header (`Authorization`).
