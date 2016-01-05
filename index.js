@@ -65,7 +65,7 @@ function *checkIn() {
 }
 
 function *locations() {
-  result = yield this.pg.db.client.query_('SELECT uuid, name FROM places;');
+  var result = yield this.pg.db.client.query_('SELECT uuid, name FROM places;');
   this.body = result.rows;
 }
 
