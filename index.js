@@ -51,21 +51,19 @@ app.use(route.get('/checkIn', checkIn));
 app.use(route.get('/locations', locations));
 
 function *checkIn() {
-  this.validateQuery('locationId')
-    .required('Location id required')
+  this.validateQuery('locationGuid')
+    .required('Location guid required')
     .isUuid('v4', 'Location id must be a valid UUID v4');
 
-  this.validateQuery('lon')
-    .required('Longitude required');
-
   var uuid = this.state.user['uuid'];
-  var query = 'INSERT INTO check_ins ("places.id", "users.id") VALUES (' + this.vals.locationId + ', (SELECT id FROM users WHERE uuid=\'' + uuid + '\'));';
+
+  var query = 'INSERT INTO check_ins ("places.id", "users.id", "created_at") VALUES ((SELECT id FROM places WHERE guid=\'' + this.vals.locationGuid + '\'), (SELECT id FROM users WHERE uuid=\'' + uuid + '\'), now());';
   var result = yield this.pg.db.client.query_(query);
   this.body = '';
 }
 
 function *locations() {
-  var result = yield this.pg.db.client.query_('SELECT uuid, name FROM places;');
+  var result = yield this.pg.db.client.query_('SELECT guid, name FROM places;');
   this.body = result.rows;
 }
 
