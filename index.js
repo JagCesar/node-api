@@ -49,6 +49,7 @@ app.use(jwt({secret: process.env.JWT_SECRET}));
 
 app.use(route.get('/checkIn', checkIn));
 app.use(route.get('/locations', locations));
+app.use(route.get('/locationsCloseToMe', locationsCloseToMe));
 
 function *checkIn() {
   this.validateQuery('locationGuid')
@@ -67,8 +68,20 @@ function *locations() {
   this.body = result.rows;
 }
 
-function *distance() {
-  var query = 'SELECT coordinate FROM places WHERE ST_Distance_Sphere(coordinate, ST_GeomFromText(\'POINT(59.3354419 18.0577941)\', 4326)) < 500;';
+function *locationsCloseToMe() {
+  this.validateQuery('lat')
+    .required('Latitude required')
+    .toFloat()
+    .isFiniteNumber('Latitude has to be a float');
+
+  this.validateQuery('lon')
+    .required('Longitude required')
+    .toFloat()
+    .isFiniteNumber('Longitude has to be a float');
+
+  var query = 'SELECT name, guid FROM places WHERE ST_Distance_Sphere(coordinate, ST_GeomFromText(\'POINT(' + this.vals.lat + ' ' + this.vals.lon + ')\', 4326)) < 500;';
+  var result = yield this.pg.db.client.query_(query);
+  this.body = result.rows;
 }
 
 app.listen(process.env.PORT);
