@@ -5,7 +5,9 @@ var koa = require('koa'),
   bouncer = require('koa-bouncer'),
   jwt = require('koa-jwt'),
   uuid = require('uuid'),
-  json = require('koa-json');
+  json = require('koa-json'),
+  crypto = require('crypto'),
+  base64url = require('base64url');
 
 app.use(koaPg(process.env.DATABASE_URL));
 app.use(bouncer.middleware());
@@ -14,6 +16,11 @@ app.use(json({ pretty: false, param: 'pretty' }));
 app.use(route.get('/', index));
 app.use(route.get('/db', initDB));
 app.use(route.get('/register', register));
+app.use(route.get('/refreshToken', refreshToken));
+
+function createPrivateToken() {
+  return base64url(crypto.randomBytes(60));
+}
 
 function *index() {
   this.body = {'message': 'Hello world'};
@@ -21,7 +28,7 @@ function *index() {
 
 function *initDB() {
   yield this.pg.db.client.query_('CREATE EXTENSION postgis;');
-  yield this.pg.db.client.query_('CREATE TABLE "users" ("id" SERIAL, "uuid" UUID NOT NULL, PRIMARY KEY ("id"), UNIQUE ("uuid"));');
+  yield this.pg.db.client.query_('CREATE TABLE "users" ("id" SERIAL, "uuid" UUID NOT NULL, "private_token" TEXT NOT NULL, PRIMARY KEY ("id"), UNIQUE ("uuid"), UNIQUE ("private_token"));');
   yield this.pg.db.client.query_('CREATE TABLE "places" ("id" serial, "name" text, "guid" UUID NOT NULL, PRIMARY KEY ("id"), UNIQUE ("guid"));');
   yield this.pg.db.client.query_('SELECT AddGeometryColumn(\'places\', \'coordinate\', 4326, \'POINT\', 2);');
   yield this.pg.db.client.query_('CREATE TABLE "check_ins" ("id" serial, "users.id" serial, "places.id" serial, "created_at" TIMESTAMPTZ NOT NULL, PRIMARY KEY ("id"), FOREIGN KEY ("users.id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE, FOREIGN KEY ("places.id") REFERENCES "places"("id") ON DELETE CASCADE ON UPDATE CASCADE);');
@@ -31,18 +38,33 @@ function *initDB() {
   yield this.pg.db.client.query_('INSERT INTO places ("name", "coordinate", "guid") VALUES (\'Google HQ\', ST_GeomFromText(\'POINT(37.4219999 -122.0862462)\', 4326), \'' + uuid.v4() + '\');');
   yield this.pg.db.client.query_('INSERT INTO places ("name", "coordinate", "guid") VALUES (\'Twitter HQ\', ST_GeomFromText(\'POINT(37.776692 -122.4189706)\', 4326), \'' + uuid.v4() + '\');');
 
-  yield this.pg.db.client.query_('INSERT INTO users ("uuid") VALUES (\'' + uuid.v4() + '\') RETURNING "id", "uuid";');
-  yield this.pg.db.client.query_('INSERT INTO  check_ins ("users.id", "places.id", "created_at") VALUES (\'1\', \'1\', now()) RETURNING "id", "users.id", "places.id", "created_at";');
+  yield this.pg.db.client.query_('INSERT INTO users ("uuid", "private_token") VALUES (\'' + uuid.v4() + '\', \'' + createPrivateToken() + '\');');
+  yield this.pg.db.client.query_('INSERT INTO check_ins ("users.id", "places.id", "created_at") VALUES (\'1\', \'1\', now());');
 
   this.body = '1';
 }
 
 function *register() {
   var uuidString = uuid.v4();
-  var query = 'INSERT INTO users (uuid) VALUES (\'' + uuidString + '\');';
+  var privateToken = createPrivateToken();
+  var query = 'INSERT INTO users (uuid,private_token) VALUES (\'' + uuidString + '\', \'' + privateToken + '\');';
   var result = yield this.pg.db.client.query_(query);
   var token = jwt.sign({ uuid: uuidString }, process.env.JWT_SECRET);
-  this.body = {'jwt': token};
+  this.body = {'jwt': token, 'private_token': privateToken};
+}
+
+function *refreshToken() {
+  this.validateQuery('privateToken')
+    .required('Private token required')
+    .isString()
+
+  var query = 'SELECT uuid FROM users WHERE private_token = \'' + this.vals.privateToken + '\';';
+  var result = yield this.pg.db.client.query_(query);
+
+  if (result.rowCount > 0) {
+    var token = jwt.sign({ uuid: result.rows[0].uuid }, process.env.JWT_SECRET);
+    this.body = {'jwt': token};
+  }
 }
 
 app.use(jwt({secret: process.env.JWT_SECRET}));
