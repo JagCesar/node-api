@@ -46,6 +46,7 @@ Make sure you're in the cloned repository folder, then do the following:
 - `/` Writes out hello world. Nothing fancy
 - `/db` Creates the tables needed and sets up PostGIS
 - `/register` Creates a new user entry in the database with a unique uuid. Then signs a new JWT that contains this uuid and returns it.
+- `/refreshToken` Creates a JWT and returns is. Requires a `private_token` to be sent as a GET query.
 - `/locations` Lists all available locations. Requires a valid JWT.
 - `/locationsCloseToMe` Lists all locations close to the coordinates sent. Send `lat`(latitude) and `lon`(longitude). Requires a valid JWT. The JWT has to be provided as a HTTP Header (`Authorization`).
 - `/checkIn` Creates a new entry in the the `check_ins` table in the database connected to the current user. This endpoint requires `locationGuid` to be sent as a GET query, and a valid JWT. The JWT has to be provided as a HTTP Header (`Authorization`). You'll find a location guid by listing locations.
