@@ -49,7 +49,7 @@ function *register() {
   var privateToken = createPrivateToken();
   var query = 'INSERT INTO users (uuid,private_token) VALUES (\'' + uuidString + '\', \'' + privateToken + '\');';
   var result = yield this.pg.db.client.query_(query);
-  var token = jwt.sign({ uuid: uuidString }, process.env.JWT_SECRET);
+  var token = jwt.sign({ uuid: uuidString }, process.env.JWT_SECRET, { expiresInMinutes: 1440, notBefore: 0, audience: "Audience", subject: "Subject", issuer: "https://www.example.com" });
   this.body = {'jwt': token, 'private_token': privateToken};
 }
 
@@ -62,7 +62,7 @@ function *refreshToken() {
   var result = yield this.pg.db.client.query_(query);
 
   if (result.rowCount > 0) {
-    var token = jwt.sign({ uuid: result.rows[0].uuid }, process.env.JWT_SECRET);
+    var token = jwt.sign({ uuid: result.rows[0].uuid }, process.env.JWT_SECRET, { expiresInMinutes: 1440, notBefore: 0, audience: "Audience", subject: "Subject", issuer: "https://www.example.com" });
     this.body = {'jwt': token};
   }
 }
