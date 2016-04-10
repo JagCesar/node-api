@@ -12,8 +12,9 @@ publicRouter
   .get('/register', function *(next) {
     var uuidString = uuid.v4();
     var privateToken = createPrivateToken();
-    var query = 'INSERT INTO users (uuid,private_token) VALUES (\'' + uuidString + '\', \'' + privateToken + '\');';
-    var result = yield this.pg.db.client.query_(query);
+    var query = 'INSERT INTO users (uuid,private_token) VALUES (\'$1\', \'$2\');';
+    var params = [uuidString, privateToken];
+    var result = yield this.pg.db.client.query_(query, params);
     var token = jwt.sign({ uuid: uuidString }, process.env.JWT_SECRET, { expiresInMinutes: 1440, notBefore: 0, audience: "Audience", subject: "Subject", issuer: "https://www.example.com" });
     this.body = {'jwt': token, 'private_token': privateToken};
   })
@@ -24,8 +25,9 @@ privateRouter
       .required('Private token required')
       .isString()
 
-    var query = 'SELECT uuid FROM users WHERE private_token = \'' + this.vals.privateToken + '\';';
-    var result = yield this.pg.db.client.query_(query);
+    var query = 'SELECT uuid FROM users WHERE private_token = \'$1\';';
+    var params = [this.vals.privateToken];
+    var result = yield this.pg.db.client.query_(query, params);
 
     if (result.rowCount > 0) {
       var token = jwt.sign({ uuid: result.rows[0].uuid }, process.env.JWT_SECRET, { expiresInMinutes: 1440, notBefore: 0, audience: "Audience", subject: "Subject", issuer: "https://www.example.com" });
